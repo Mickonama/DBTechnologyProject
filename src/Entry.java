@@ -1,5 +1,9 @@
-public interface Entry {
+public abstract class Entry {
 
-    boolean isLeaf();
+    MBR mbr;
+    public abstract boolean isLeaf();
 
+    public MBR getMbr() {
+        return mbr;
+    }
 }

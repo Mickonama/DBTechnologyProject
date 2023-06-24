@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -14,12 +15,12 @@ public class Main {
         }
 
         Point p1 = new Point(2, new double[] {2, 4});
-        Point p2 = new Point(2, new double[] {3, 5});
+        Point p2 = new Point(2, new double[] {3, 6});
 
         MBR mbr1 = new MBR(new double[][] {{2, 4}, {1, 5}});
-        MBR mbr2 = new MBR(new double[][]{{3, 5}, {3, 4}});
+        MBR mbr2 = new MBR(new double[][] {{1, 5}, {1, 2}});
+        MBR mbr3 = new MBR(new double[][] {{3, 5}, {3, 5}});
 
-        System.out.println(mbr1.overlaps(mbr2));
 
     }
 }

@@ -147,13 +147,6 @@ public class DiskManager {
             ArrayList<Record> records = (ArrayList<Record>) deserialize(block);
 
             return records;
-//            goodPutLengthInBytes = serialize(new Random().nextInt()); // Serializing an integer ir order to get the size of goodPutLength in bytes
-//            System.arraycopy(block, 0, goodPutLengthInBytes, 0, goodPutLengthInBytes.length);
-//
-//            recordsInBlock = new byte[(Integer) deserialize(goodPutLengthInBytes)];
-//            System.arraycopy(block, goodPutLengthInBytes.length, recordsInBlock, 0, recordsInBlock.length);
-//
-//            return (ArrayList<Coordinate>) deserialize(recordsInBlock);
 
         } catch (Exception e) {
             e.printStackTrace();
