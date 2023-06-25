@@ -3,10 +3,9 @@ package RTree;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Node implements Serializable {
+public class Node implements Serializable {
 
-
-    private final int LEVEL;
+    int LEVEL;
     Entry<Node> parentEntry;
     Node parentNode;
 
@@ -23,5 +22,20 @@ public abstract class Node implements Serializable {
         this.parentEntry = parentEntry;
     }
 
-    public abstract boolean isLeaf();
+    public Node(ArrayList<Entry<?>> entries) {
+        this.entries = entries;
+    }
+
+
+    public ArrayList<Entry<?>> getEntries() {
+        return entries;
+    }
+
+    public boolean childIsLeaf() {
+        return entries.size() > 0 && entries.get(0).pointer instanceof LeafNode;
+    }
+
+    public void addEntry(Entry<?> entry) {
+        entries.add(entry);
+    }
 }

@@ -4,6 +4,7 @@ import utilities.Point;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class Main {
@@ -26,11 +27,8 @@ public class Main {
         MBR mbr2 = new MBR(new double[][] {{1, 5}, {1, 2}});
         MBR mbr3 = new MBR(new double[][] {{3, 5}, {3, 5}});
 
-        LeafNode ln = new LeafNode(1);
-        LeafNode ln2 = new LeafNode(2);
-
 //        RTree.Node.Entry<RTree.Node> entry = new RTree.Node.Entry<>(mbr1, new RTree.InternalNode(2));
-        RStarTree rst = new RStarTree();
+        RStarTree rst = new RStarTree(100);
         InternalNode in1 = new InternalNode(1, null);
         InternalNode in2 = new InternalNode(2);
         InternalNode in3 = new InternalNode(2);
@@ -44,14 +42,19 @@ public class Main {
         LeafNode in5 = new LeafNode(3);
         //c
         in2.addEntry(new MBR(new double[][] {{3, 3}, {3, 3}}), in4);
+        in2.addEntry(new MBR(new double[][] {{1, 1}, {1, 1}}), in4);
         //d
         in3.addEntry(new MBR(new double[][] {{4, 4}, {5, 5}}), in5);
+        in3.addEntry(new MBR(new double[][] {{0, 2}, {0, 1}}), in5);
         //e
         in5.addEntry(mbr1,1,2);
         in4.addEntry(mbr1, 1, 3);
 
         System.out.println(rst.chooseSubTree(in1, new MBR(new double[][] {{2, 3}, {0, 1}})));
 //        System.out.println(in1);
+        System.out.println(in1.getEntries().get(0));
+        in1.getEntries().get(0).adjustMbr();
+        System.out.println(in1.getEntries().get(0));
 
     }
 }
