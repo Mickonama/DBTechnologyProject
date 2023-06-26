@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class DiskManager {
     public final int BLOCK_SIZE; //Block size in bytes 32KB
     public final int DIMENSION;
-    private final int RECORDS_PER_BLOCK;
+    public final int RECORDS_PER_BLOCK;
     public int NUMBER_OF_BLOCKS = 0;
     public int NUMBER_OF_RECORDS = 0;
     public DiskManager() throws IOException {

@@ -85,6 +85,17 @@ public class MBR {
         return area;
     }
 
+    public Point center() {
+        Point center = new Point(DIMENSION);
+        for (int i = 0; i < DIMENSION; i++) {
+            center.getX()[i] = (this.bounds[i][0] + this.bounds[i][1]) / 2;
+        }
+        return center;
+    }
+    public double distanceToCenter(MBR mbr) {
+        return this.center().distance(mbr.center());
+    }
+
     public static MBR fitMBR(ArrayList<Entry<?>> entries){
         MBR mbr = new MBR(entries.get(0).mbr.getBounds());
         for (Entry<?> entry : entries) {

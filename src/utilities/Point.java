@@ -22,7 +22,11 @@ public class Point implements Serializable {
         return x;
     }
 
-    public void setX(double[] x) {
-        this.x = x;
+    public double distance(Point p) {
+        double d = 0;
+        for (int i = 0; i < DIMENSION; i++) {
+            d += Math.abs(this.x[i] - p.x[i]);
+        }
+        return d;
     }
 }

@@ -16,8 +16,25 @@ public class Entry<T> {
         this.pointer = pointer;
     }
 
+    public static class RecordPointer {
+        long blockId, recordId;
+
+        public RecordPointer(long blockId, long recordId) {
+            this.blockId = blockId;
+            this.recordId = recordId;
+        }
+
+        @Override
+        public String toString() {
+            return "RecordPointer{" +
+                    "blockId=" + blockId +
+                    ", recordId=" + recordId +
+                    '}';
+        }
+    }
+
     public void adjustMbr() {
-        if (pointer instanceof LeafNode.RecordPointer)
+        if (pointer instanceof RecordPointer)
             return;
         Node childNode = (Node) pointer;
         this.mbr = MBR.fitMBR(childNode.entries);

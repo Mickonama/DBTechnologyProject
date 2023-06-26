@@ -15,26 +15,35 @@ public class RStarTree {
     boolean[] overflowOnLevel;
     Node root;
 
-    public RStarTree(int MAX_CAPACITY){
-        root = new LeafNode(0);
+    public RStarTree(int MAX_CAPACITY) {
+        root = new Node(0);
+        DEPTH = 0;
         this.MAX_CAPACITY = MAX_CAPACITY;
         this.MIN_CAPACITY = (int) Math.round(0.4 * MAX_CAPACITY);
     }
 
-    public LeafNode chooseSubTree(Node start, MBR newMBR) {
-        return (LeafNode) chooseSubTree(start, newMBR, DEPTH);
-    }
-    private Node chooseSubTree(Node start, MBR newMBR, int lvl){
-        if (start.LEVEL == lvl)
-            return start;
-        InternalNode currentNode = (InternalNode) start;
-        Entry<?> nextNode;
-        if (currentNode.childIsLeaf())
-            nextNode = Collections.min(currentNode.entries, Entry.minOverlapCostCriterion(newMBR, currentNode.entries).thenComparing(Entry.minAreaEnlargementCostCriterion(newMBR)));
+//    public Node chooseSubTree(Node start, MBR newMBR) {
+//        return chooseSubTree(start, newMBR, DEPTH);
+//    }
+
+//    private Entry<?> chooseSubTree(Entry<?> parent, Node currentNode, MBR newMBR, int lvl) {
+//        if (currentNode.LEVEL == lvl)
+//            return parent;
+////        Entry<?> idealEntry;
+//        if (currentNode.childIsLeaf())
+//            parent = Collections.min(currentNode.entries, Entry.minOverlapCostCriterion(newMBR, currentNode.entries).thenComparing(Entry.minAreaEnlargementCostCriterion(newMBR)));
+//        else
+//            parent = Collections.min(currentNode.entries, Entry.minAreaEnlargementCostCriterion(newMBR));
+//        return chooseSubTree(parent, ((Node) parent.pointer), newMBR, lvl);
+//    }
+
+    private Entry<?> chooseSubTree(Node currentNode, MBR newMBR, int lvl) {
+        if (currentNode.LEVEL == lvl + 1)
+            return Collections.min(currentNode.entries, Entry.minOverlapCostCriterion(newMBR, currentNode.entries).thenComparing(Entry.minAreaEnlargementCostCriterion(newMBR)));
         else
-            nextNode = Collections.min(currentNode.entries, Entry.minAreaEnlargementCostCriterion(newMBR));
-        return chooseSubTree(((Node) nextNode.pointer), newMBR);
+            return Collections.min(currentNode.entries, Entry.minAreaEnlargementCostCriterion(newMBR));
     }
+
     private int chooseSplitAxis(Node node) {
         int axis = 0;
         int DIMENSION = node.entries.get(0).mbr.DIMENSION;
@@ -47,16 +56,17 @@ public class RStarTree {
                 int finalLowerUpperValue = lowerUpperValue;
                 currentEntries.sort(Comparator.comparingDouble(o -> o.mbr.bounds[finalAxis][finalLowerUpperValue]));
                 for (int k = 0; k < MAX_CAPACITY - 2 * MIN_CAPACITY + 2; k++) {
-                    Node group1 = new Node((ArrayList<Entry<?>>) currentEntries.subList(0, MIN_CAPACITY - 1 + k));
-                    Node group2 = new Node((ArrayList<Entry<?>>) currentEntries.subList(MIN_CAPACITY - 1 + k, currentEntries.size()));
+                    Node group1 = new Node(node.LEVEL, new ArrayList<>(currentEntries.subList(0, MIN_CAPACITY - 1 + k)));
+                    Node group2 = new Node(node.LEVEL, new ArrayList<>(currentEntries.subList(MIN_CAPACITY - 1 + k, currentEntries.size())));
 
                     S += MBR.fitMBR(group1.entries).marginValue() + MBR.fitMBR(group2.entries).marginValue();
                 }
-                computedS.add(S);
             }
+            computedS.add(S);
         }
         return computedS.indexOf(Collections.min(computedS));
     }
+
     private Node[] chooseSplitIndex(int axis, Node node) {
         class Distribution {
             Node group1, group2;
@@ -70,8 +80,8 @@ public class RStarTree {
             currentEntries.sort(Comparator.comparingDouble(o -> o.mbr.bounds[axis][finalLowerUpperValue]));
             for (int k = 0; k < MAX_CAPACITY - 2 * MIN_CAPACITY + 2; k++) {
                 Distribution currentDistribution = new Distribution();
-                currentDistribution.group1 = new Node((ArrayList<Entry<?>>) currentEntries.subList(0, MIN_CAPACITY - 1 + k));
-                currentDistribution.group2 = new Node((ArrayList<Entry<?>>) currentEntries.subList(MIN_CAPACITY - 1 + k, currentEntries.size()));
+                currentDistribution.group1 = new Node(node.LEVEL, new ArrayList<>(currentEntries.subList(0, MIN_CAPACITY - 1 + k)));
+                currentDistribution.group2 = new Node(node.LEVEL, new ArrayList<>(currentEntries.subList(MIN_CAPACITY - 1 + k, currentEntries.size())));
 
                 currentDistribution.overlapValue += MBR.fitMBR(currentDistribution.group1.entries).overlapArea(MBR.fitMBR(currentDistribution.group2.entries));
                 currentDistribution.areaValue += MBR.fitMBR(currentDistribution.group1.entries).areaCalc() + MBR.fitMBR(currentDistribution.group2.entries).areaCalc();
@@ -83,25 +93,91 @@ public class RStarTree {
         newNodes[1] = minDistribution.group2;
         return newNodes;
     }
+
     private Node[] split(Node node) {
         int axis = chooseSplitAxis(node);
         return chooseSplitIndex(axis, node);
     }
-    public void insertData(Entry<LeafNode.RecordPointer> entry) {
-        insert(entry, DEPTH);
+
+    public void insertData(Entry<?> entry) {
+        overflowOnLevel = new boolean[DEPTH + 1];
+        insert(null, entry, DEPTH);
+        System.out.println(root.entries);
+    }
+    public void insertData(MBR mbr, long blockId, long id) {
+        Entry< Entry.RecordPointer> entry = new Entry<>(mbr, new Entry.RecordPointer(blockId, id));
+        insertData(entry);
     }
 
-    public void insert(Entry<?> entry, int lvl) {
-        Node node = chooseSubTree(root, entry.mbr, lvl);
-        if (node.entries.size() < MAX_CAPACITY){
-            node.addEntry(entry);
-            return;
+    public Entry<?> insert(Entry<?> parentEntry, Entry<?> entry, int lvl) {
+        Node currentNode;
+        if (parentEntry == null)
+            currentNode = root;
+        else {
+            parentEntry.mbr = parentEntry.mbr.enlargeMBR(entry.mbr);
+            currentNode = (Node) parentEntry.pointer;
         }
-        overflowOnLevel = new boolean[DEPTH];
 
+        if (currentNode.LEVEL == lvl) {
+            currentNode.addEntry(entry);
+        } else {
+            Entry<?> idealEntry = chooseSubTree(currentNode, entry.mbr, lvl);
+
+            Entry<?> newEntry = insert(idealEntry, entry, lvl);
+
+            if (newEntry != null){
+                currentNode.addEntry(newEntry);
+            }
+        }
+        if (currentNode.entries.size() > MAX_CAPACITY) {
+            return overFlowTreatment(parentEntry, currentNode);
+        }
+
+        return null;
 
     }
-    private void overFlowTreatment(int lvl) {
+
+    private Entry<?> overFlowTreatment(Entry<?> parent, Node childNode) {
+        int lvl = childNode.LEVEL;
+        if (!overflowOnLevel[lvl] && lvl != DEPTH) {
+            overflowOnLevel[lvl] = true;
+            reInsert(parent, childNode);
+            return null;
+        }
+
+        Node[] newNodes = split(childNode);
+
+        childNode.entries = newNodes[0].entries;
+
+        if (lvl == DEPTH) {
+            DEPTH++;
+            Node newRoot = new Node(DEPTH);
+            newRoot.addEntry(new Entry<>(MBR.fitMBR(childNode.entries), childNode));
+            newRoot.addEntry(new Entry<>(MBR.fitMBR(newNodes[1].entries), newNodes[1]));
+            this.root = newRoot;
+            return null;
+        }
+
+        parent.adjustMbr();
+        return new Entry<>(MBR.fitMBR(newNodes[1].entries), newNodes[1]);
+    }
+
+    private void reInsert(Entry<?> parent, Node childNode) {
+        Node parentNode = (Node) parent.pointer;
+        MBR bb = MBR.fitMBR(parentNode.entries);
+        childNode.entries.sort(Comparator.comparingDouble(o -> o.mbr.distanceToCenter(bb)));
+        int P = (int) Math.round(0.3 * MAX_CAPACITY);
+        ArrayList<Entry<?>> removedEntries = new ArrayList<>(childNode.entries.subList(childNode.entries.size() - P, childNode.entries.size()));
+
+        for (int i = 0; i < P; i++) {
+            childNode.entries.remove(childNode.entries.size() - 1);
+        }
+
+        parent.adjustMbr();
+
+        for (Entry<?> re : removedEntries) {
+            insert(null, re, childNode.LEVEL);
+        }
 
     }
 }
