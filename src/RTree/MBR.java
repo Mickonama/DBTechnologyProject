@@ -114,4 +114,10 @@ public class MBR {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+
+        return Arrays.deepEquals(bounds, ((MBR) o).bounds);
+    }
+
 }

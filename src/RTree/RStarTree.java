@@ -10,7 +10,7 @@ import java.util.Comparator;
 public class RStarTree {
     private final int MIN_CAPACITY;
     private final int MAX_CAPACITY;
-    private int DEPTH;
+    public int DEPTH;
 
     boolean[] overflowOnLevel;
     Node root;
@@ -101,8 +101,7 @@ public class RStarTree {
 
     public void insertData(Entry<?> entry) {
         overflowOnLevel = new boolean[DEPTH + 1];
-        insert(null, entry, DEPTH);
-        System.out.println(root.entries);
+        insert(null, entry, 0);
     }
     public void insertData(MBR mbr, long blockId, long id) {
         Entry< Entry.RecordPointer> entry = new Entry<>(mbr, new Entry.RecordPointer(blockId, id));
@@ -180,4 +179,24 @@ public class RStarTree {
         }
 
     }
+
+    public void findRecord(MBR mbr){
+        findRecord(mbr, root);
+    }
+    public void findRecord(MBR mbr, Node currentNode) {
+        if (currentNode.LEVEL == 0){
+            for (Entry<?> entry : currentNode.entries){
+                if(entry.mbr.equals(mbr)) {
+                    System.out.println(entry);
+                    System.out.println(entry.pointer);
+                }
+            }
+            return;
+        }
+
+        for (Entry<?> entry: currentNode.entries)
+            if(entry.mbr.overlaps(mbr))
+                findRecord(mbr, ((Node) entry.pointer));
+    }
+
 }
