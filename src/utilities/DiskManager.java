@@ -1,5 +1,7 @@
 package utilities;
 
+import RTree.Entry;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -60,16 +62,11 @@ public class DiskManager {
             Record r = new Record(0, 0, new Point(dim));
             records.add(r);
 
-            byte[] recordInBytes, goodPutLengthInBytes;
-
-//            recordInBytes = new byte[];
-//            goodPutLengthInBytes = new byte[];
+            byte[] recordInBytes;
 
             try {
                 recordInBytes = serialize(records);
-//                System.out.println(recordInBytes.length +" " + serialize(r).length + " " + i);
 
-//                goodPutLengthInBytes = serialize(recordInBytes.length);
                 if (recordInBytes.length > BLOCK_SIZE) {
                     break;
                 }
@@ -199,6 +196,14 @@ public class DiskManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Record retrieveRecord(Entry<Entry.RecordPointer> entry){
+        return retrieveRecord(entry.getPointer().getBlockId(), entry.getPointer().getRecordId());
+    }
+
+    public Record retrieveRecord(long blockId, long slot){
+        return readBlock(((int) blockId)).get(((int) slot));
     }
 
 }

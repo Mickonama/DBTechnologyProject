@@ -24,12 +24,17 @@ public class Entry<T> {
             this.recordId = recordId;
         }
 
+        public long getBlockId() {
+            return blockId;
+        }
+
+        public long getRecordId() {
+            return recordId;
+        }
+
         @Override
         public String toString() {
-            return "RecordPointer{" +
-                    "blockId=" + blockId +
-                    ", recordId=" + recordId +
-                    '}';
+            return "blockID: " + blockId + " slot: " + recordId;
         }
     }
 
@@ -39,13 +44,12 @@ public class Entry<T> {
         Node childNode = (Node) pointer;
         this.mbr = MBR.fitMBR(childNode.entries);
 
+
     }
 
     @Override
     public String toString() {
-        return "Entry{" +
-                "mbr=" + mbr +
-                '}';
+        return "MBR(" + mbr + ") -> " + pointer;
     }
 
     public MBR getMbr() {

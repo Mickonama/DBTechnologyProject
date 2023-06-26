@@ -2,6 +2,7 @@ package utilities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Point implements Serializable {
     public final int DIMENSION;
@@ -28,5 +29,10 @@ public class Point implements Serializable {
             d += Math.abs(this.x[i] - p.x[i]);
         }
         return d;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(x);
     }
 }

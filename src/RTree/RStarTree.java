@@ -1,7 +1,6 @@
 package RTree;
 
-import utilities.DiskManager;
-import utilities.Record;
+import utilities.Point;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,21 +20,6 @@ public class RStarTree {
         this.MAX_CAPACITY = MAX_CAPACITY;
         this.MIN_CAPACITY = (int) Math.round(0.4 * MAX_CAPACITY);
     }
-
-//    public Node chooseSubTree(Node start, MBR newMBR) {
-//        return chooseSubTree(start, newMBR, DEPTH);
-//    }
-
-//    private Entry<?> chooseSubTree(Entry<?> parent, Node currentNode, MBR newMBR, int lvl) {
-//        if (currentNode.LEVEL == lvl)
-//            return parent;
-////        Entry<?> idealEntry;
-//        if (currentNode.childIsLeaf())
-//            parent = Collections.min(currentNode.entries, Entry.minOverlapCostCriterion(newMBR, currentNode.entries).thenComparing(Entry.minAreaEnlargementCostCriterion(newMBR)));
-//        else
-//            parent = Collections.min(currentNode.entries, Entry.minAreaEnlargementCostCriterion(newMBR));
-//        return chooseSubTree(parent, ((Node) parent.pointer), newMBR, lvl);
-//    }
 
     private Entry<?> chooseSubTree(Node currentNode, MBR newMBR, int lvl) {
         if (currentNode.LEVEL == lvl + 1)
@@ -103,8 +87,9 @@ public class RStarTree {
         overflowOnLevel = new boolean[DEPTH + 1];
         insert(null, entry, 0);
     }
+
     public void insertData(MBR mbr, long blockId, long id) {
-        Entry< Entry.RecordPointer> entry = new Entry<>(mbr, new Entry.RecordPointer(blockId, id));
+        Entry<Entry.RecordPointer> entry = new Entry<>(mbr, new Entry.RecordPointer(blockId, id));
         insertData(entry);
     }
 
@@ -124,14 +109,13 @@ public class RStarTree {
 
             Entry<?> newEntry = insert(idealEntry, entry, lvl);
 
-            if (newEntry != null){
+            if (newEntry != null) {
                 currentNode.addEntry(newEntry);
             }
         }
         if (currentNode.entries.size() > MAX_CAPACITY) {
             return overFlowTreatment(parentEntry, currentNode);
         }
-
         return null;
 
     }
@@ -180,23 +164,34 @@ public class RStarTree {
 
     }
 
-    public void findRecord(MBR mbr){
-        findRecord(mbr, root);
+    public ArrayList<Entry<Entry.RecordPointer>> rangeQuery(MBR mbr) {
+        return rangeQuery(mbr, root);
     }
-    public void findRecord(MBR mbr, Node currentNode) {
-        if (currentNode.LEVEL == 0){
-            for (Entry<?> entry : currentNode.entries){
-                if(entry.mbr.equals(mbr)) {
-                    System.out.println(entry);
-                    System.out.println(entry.pointer);
+
+    public ArrayList<Entry<Entry.RecordPointer>> rangeQuery(Point p) {
+        MBR mbr = new MBR(p);
+        return rangeQuery(mbr);
+    }
+
+    public ArrayList<Entry<Entry.RecordPointer>> rangeQuery(MBR mbr, Node currentNode) {
+        ArrayList<Entry<Entry.RecordPointer>> foundEntries = new ArrayList<>();
+        if (currentNode.LEVEL == 0) {
+            for (Entry<?> entry : currentNode.entries) {
+                if (entry.mbr.overlaps(mbr)) {
+                    foundEntries.add(((Entry<Entry.RecordPointer>) entry));
                 }
             }
-            return;
+        } else {
+            for (Entry<?> entry : currentNode.entries)
+                if (entry.mbr.overlaps(mbr)) {
+                    ArrayList<Entry<Entry.RecordPointer>> additionalEntries = rangeQuery(mbr, ((Node) entry.pointer));
+                    if (additionalEntries != null)
+                        foundEntries.addAll(additionalEntries);
+                }
         }
-
-        for (Entry<?> entry: currentNode.entries)
-            if(entry.mbr.overlaps(mbr))
-                findRecord(mbr, ((Node) entry.pointer));
+        if (foundEntries.size() == 0)
+            return null;
+        return foundEntries;
     }
 
 }

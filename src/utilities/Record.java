@@ -36,4 +36,6 @@ public class Record implements Serializable {
     public Point getP() {
         return p;
     }
+
+
 }

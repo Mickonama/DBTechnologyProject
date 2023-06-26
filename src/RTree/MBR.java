@@ -109,9 +109,7 @@ public class MBR {
 
     @Override
     public String toString() {
-        return "RTree.MBR{" +
-                "bounds=" + Arrays.deepToString(bounds) +
-                '}';
+        return Arrays.deepToString(bounds);
     }
 
     @Override
