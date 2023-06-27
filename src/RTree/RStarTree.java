@@ -2,9 +2,7 @@ package RTree;
 
 import utilities.Point;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 
 public class RStarTree {
     private final int MIN_CAPACITY;
@@ -164,6 +162,39 @@ public class RStarTree {
 
     }
 
+    public void deleteData(Point p) {
+        delete(root, new MBR(p));
+    }
+
+    private ArrayList<Entry<?>> delete(Node currentNode, MBR mbr) {
+
+
+        Iterator<Entry<?>> iter = currentNode.entries.iterator();
+
+        while (iter.hasNext()) {
+            Entry<?> currentEntry = iter.next();
+            if (currentEntry.mbr.overlaps(mbr)) {
+                if (currentNode.isLeaf()) {
+                    iter.remove();
+                    return currentNode.entries;
+                }
+                ArrayList<Entry<?>> orphans = delete(((Node) currentEntry.pointer), mbr);
+                if(orphans == null)
+                    return null;
+                if (orphans.size() >= MIN_CAPACITY) {
+                    currentEntry.adjustMbr();
+                }else{
+                    iter.remove();
+                    for (Entry<?> orphan: orphans){
+                        insert(currentEntry, orphan, currentNode.LEVEL - 1);
+                    }
+                }
+            }
+        }
+        return null;
+
+    }
+
     public ArrayList<Entry<Entry.RecordPointer>> rangeQuery(MBR mbr) {
         return rangeQuery(mbr, root);
     }
@@ -193,5 +224,9 @@ public class RStarTree {
             return null;
         return foundEntries;
     }
+
+//    public ArrayList<Entry<Entry.RecordPointer>> kNNQuery(Point){
+//
+//    }
 
 }

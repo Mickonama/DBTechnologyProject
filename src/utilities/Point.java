@@ -32,6 +32,12 @@ public class Point implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        Point point = (Point) o;
+        return Arrays.equals(x, point.x);
+    }
+
+    @Override
     public String toString() {
         return Arrays.toString(x);
     }

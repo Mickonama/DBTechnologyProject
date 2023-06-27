@@ -17,8 +17,6 @@ public class DiskManager {
         this.BLOCK_SIZE = 32768;
         this.DIMENSION = 2;
         RECORDS_PER_BLOCK = recordsPerBlockCalc(DIMENSION);
-        System.out.println("The records per block are " + RECORDS_PER_BLOCK);
-        System.out.println();
     }
 
     public DiskManager(int DIMENSION) throws IOException {
