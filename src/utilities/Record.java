@@ -3,6 +3,7 @@ package utilities;
 import utilities.Point;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Record implements Serializable {
     int id;
@@ -36,6 +37,4 @@ public class Record implements Serializable {
     public Point getP() {
         return p;
     }
-
-
 }

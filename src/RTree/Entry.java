@@ -47,6 +47,14 @@ public class Entry<T> {
 
     }
 
+    public boolean dominated(ArrayList<Entry<RecordPointer>> entries){
+        for (Entry<?> s: entries) {
+            if (s.mbr.toPoint().dominates(this.mbr.toPoint())) {
+                return true;
+            }
+        }
+        return false;
+    }
     @Override
     public String toString() {
         return "MBR(" + mbr + ") -> " + pointer;

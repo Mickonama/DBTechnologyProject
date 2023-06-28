@@ -31,6 +31,14 @@ public class Point implements Serializable {
         return d;
     }
 
+    public boolean dominates(Point p) {
+        for (int i = 0; i < DIMENSION; i++) {
+            if (p.x[i] < x[i])
+                return false;
+        }
+        return true;
+    }
+
     @Override
     public boolean equals(Object o) {
         Point point = (Point) o;

@@ -179,13 +179,13 @@ public class RStarTree {
                     return currentNode.entries;
                 }
                 ArrayList<Entry<?>> orphans = delete(((Node) currentEntry.pointer), mbr);
-                if(orphans == null)
+                if (orphans == null)
                     return null;
                 if (orphans.size() >= MIN_CAPACITY) {
                     currentEntry.adjustMbr();
-                }else{
+                } else {
                     iter.remove();
-                    for (Entry<?> orphan: orphans){
+                    for (Entry<?> orphan : orphans) {
                         insert(currentEntry, orphan, currentNode.LEVEL - 1);
                     }
                 }
@@ -195,38 +195,8 @@ public class RStarTree {
 
     }
 
-    public ArrayList<Entry<Entry.RecordPointer>> rangeQuery(MBR mbr) {
-        return rangeQuery(mbr, root);
+    public Node getRoot() {
+        return root;
     }
-
-    public ArrayList<Entry<Entry.RecordPointer>> rangeQuery(Point p) {
-        MBR mbr = new MBR(p);
-        return rangeQuery(mbr);
-    }
-
-    public ArrayList<Entry<Entry.RecordPointer>> rangeQuery(MBR mbr, Node currentNode) {
-        ArrayList<Entry<Entry.RecordPointer>> foundEntries = new ArrayList<>();
-        if (currentNode.LEVEL == 0) {
-            for (Entry<?> entry : currentNode.entries) {
-                if (entry.mbr.overlaps(mbr)) {
-                    foundEntries.add(((Entry<Entry.RecordPointer>) entry));
-                }
-            }
-        } else {
-            for (Entry<?> entry : currentNode.entries)
-                if (entry.mbr.overlaps(mbr)) {
-                    ArrayList<Entry<Entry.RecordPointer>> additionalEntries = rangeQuery(mbr, ((Node) entry.pointer));
-                    if (additionalEntries != null)
-                        foundEntries.addAll(additionalEntries);
-                }
-        }
-        if (foundEntries.size() == 0)
-            return null;
-        return foundEntries;
-    }
-
-//    public ArrayList<Entry<Entry.RecordPointer>> kNNQuery(Point){
-//
-//    }
 
 }

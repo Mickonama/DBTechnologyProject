@@ -103,6 +103,32 @@ public class MBR {
         }
         return mbr;
     }
+
+    public double minDist(Point p) {
+        assert p.DIMENSION == this.DIMENSION;
+        double d = 0;
+        for (int i = 0; i < DIMENSION; i++) {
+            double r = p.getX()[i];
+            if (p.getX()[i] < bounds[i][0])
+                r = bounds[i][0];
+            if (p.getX()[i] > bounds[i][1])
+                r = bounds[i][1];
+
+            d += Math.pow(Math.abs(p.getX()[i] - r), 2);
+        }
+        return d;
+    }
+    public double minDist(){
+        return minDist(new Point(DIMENSION, new double[] {0, 0}));
+    }
+
+    public Point toPoint() {
+        double[] p = new double[DIMENSION];
+        for (int i = 0; i < DIMENSION; i++) {
+            p[i] = bounds[i][0];
+        }
+        return new Point(DIMENSION, p);
+    }
     public double[][] getBounds() {
         return bounds;
     }
@@ -117,5 +143,7 @@ public class MBR {
 
         return Arrays.deepEquals(bounds, ((MBR) o).bounds);
     }
+
+
 
 }

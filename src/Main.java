@@ -1,11 +1,10 @@
 import RTree.*;
-import queries.SerialRangeQuery;
+import queries.IndexedQuery;
+import queries.SerialQuery;
 import utilities.DiskManager;
 import utilities.Point;
 import utilities.Record;
 
-import javax.management.Query;
-import java.awt.image.AreaAveragingScaleFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -29,35 +28,54 @@ public class Main {
         }
         System.out.println();
 
-        MBR queryMBR = new MBR(new double[][]{{40.5915634, 40.5916978}, {0, 9999}});
+//        MBR queryMBR = new MBR(new double[][]{{40.5915634, 40.5916978}, {0, 9999}});
+        MBR queryMBR = new MBR(new double[][]{{2, 3}, {1, 2}});
 
-        long start = System.currentTimeMillis();
-        ArrayList<Entry<Entry.RecordPointer>> result = rst.rangeQuery(queryMBR);
-        System.out.println("RTREE QUERY: " + (System.currentTimeMillis() - start));
-
+        IndexedQuery query = new IndexedQuery(rst);
+        ArrayList<Entry<Entry.RecordPointer>> result = query.rangeQuery(queryMBR);
         ArrayList<Record> rTreeQueryResult = new ArrayList<>();
         for (Entry<Entry.RecordPointer> entry: result){
             rTreeQueryResult.add(dm.retrieveRecord(entry));
         }
-        System.out.println();
-
-        SerialRangeQuery srq = new SerialRangeQuery(dm);
-
-        start = System.currentTimeMillis();
-        ArrayList<Record> serialQueryResult = srq.query(queryMBR);
-        System.out.println("SERIAL QUERY: " + (System.currentTimeMillis() - start));
-
-
-//        System.out.println();
         rTreeQueryResult.forEach(System.out::println);
+
+        System.out.println();
+        SerialQuery srq = new SerialQuery(dm);
+
+
+        ArrayList<Record> serialQueryResult = srq.rangeQuery(queryMBR);
+
+
 //        System.out.println();
-//        serialQueryResult.forEach(System.out::println);
+//        System.out.println();
+        serialQueryResult.forEach(System.out::println);
 
 //        System.out.println(rst.DEPTH);
 
-        System.out.println("DELETINGGGGGGGGGGGGGGGGGGG");
-        rst.deleteData(new Point(dm.DIMENSION, new double[] {40.5916336, 23.0180504}));
-        result = rst.rangeQuery(queryMBR);
+//        System.out.println("DELETINGGGGGGGGGGGGGGGGGGG");
+//        rst.deleteData(new Point(dm.DIMENSION, new double[] {40.5916336, 23.0180504}));
+//        result = query.rangeQuery(queryMBR);
+//        rTreeQueryResult = new ArrayList<>();
+//        for (Entry<Entry.RecordPointer> entry: result){
+//            rTreeQueryResult.add(dm.retrieveRecord(entry));
+//        }
+//        rTreeQueryResult.forEach(System.out::println);
+
+        System.out.println("KNNNNNNNNNNNNNNNNNNNN");
+        result = query.kNNQuery(new Point(2, new double[] {0, 0}), 3);
+        rTreeQueryResult = new ArrayList<>();
+        for (Entry<Entry.RecordPointer> entry: result){
+            rTreeQueryResult.add(dm.retrieveRecord(entry));
+        }
+        rTreeQueryResult.forEach(System.out::println);
+
+
+        System.out.println("SERIAL KNN");
+        serialQueryResult = srq.serialKNN(new Point(2, new double[] {0, 0}), 3);
+        serialQueryResult.forEach(System.out::println);
+
+        System.out.println("SKYLINE BITCHES");
+        result = query.skyline();
         rTreeQueryResult = new ArrayList<>();
         for (Entry<Entry.RecordPointer> entry: result){
             rTreeQueryResult.add(dm.retrieveRecord(entry));

@@ -8,7 +8,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class DiskManager {
-    public final int BLOCK_SIZE; //Block size in bytes 32KB
+    public final int BLOCK_SIZE; //Block size in bytes, 32KB is default
     public final int DIMENSION;
     public final int RECORDS_PER_BLOCK;
     public int NUMBER_OF_BLOCKS = 0;
@@ -23,7 +23,6 @@ public class DiskManager {
         this.BLOCK_SIZE = 32768;
         this.DIMENSION = DIMENSION;
         RECORDS_PER_BLOCK = recordsPerBlockCalc(DIMENSION);
-        System.out.println("The records per block are " + RECORDS_PER_BLOCK);
 
     }
 
@@ -31,7 +30,6 @@ public class DiskManager {
         this.BLOCK_SIZE = BLOCK_SIZE;
         this.DIMENSION = DIMENSION;
         RECORDS_PER_BLOCK = recordsPerBlockCalc(DIMENSION);
-        System.out.println("The records per block are " + RECORDS_PER_BLOCK);
     }
 
     private static byte[] serialize(Object obj) throws IOException {
@@ -162,7 +160,7 @@ public class DiskManager {
 //            updateMetaData(PATH_TO_DATAFILE);
 //            ArrayList<Coordinate> blockCoordinates = new ArrayList<>();
             ArrayList<Record> recordBlock = new ArrayList<>();
-            String COORDINATES_FILE_PATH = "coordinates.csv";
+            String COORDINATES_FILE_PATH = "coordinates2.csv";
             BufferedReader csvReader = (new BufferedReader(new FileReader(COORDINATES_FILE_PATH))); // BufferedReader used to read the data from the csv file
 
             int slot = 0;
