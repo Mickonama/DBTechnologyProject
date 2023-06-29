@@ -90,24 +90,5 @@ public class Entry<T> {
         };
     }
 
-    public static Comparator<Entry<RecordPointer>> rankSpaceSort(int axis){
-        return (o1, o2) -> {
-            int comparison = 0;
-            for (int i = axis; i < o1.getMbr().DIMENSION; i++) {
-                comparison = Double.compare(o1.getMbr().toPoint().getX()[i], o2.getMbr().toPoint().getX()[i]);
-                if (comparison == 0)
-                    continue;
-                return comparison;
-            }
-            for (int i = 0; i < axis; i++) {
-                comparison = Double.compare(o1.getMbr().toPoint().getX()[i], o2.getMbr().toPoint().getX()[i]);
-                if (comparison == 0)
-                    continue;
-                return comparison;
-            }
-            return comparison;
-        };
-    }
-
 
 }

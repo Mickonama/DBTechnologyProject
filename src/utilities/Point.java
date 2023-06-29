@@ -40,6 +40,15 @@ public class Point implements Serializable {
         return true;
     }
 
+    public int zOrder() {
+        int z = 0;
+        for (int i = 0; i < Integer.SIZE; i++) {
+            for (int axis = 0; axis < DIMENSION; axis++) {
+                z |= ((((int) this.getX()[axis]) & (1 << i)) << (i + axis));
+            }
+        }
+        return z;
+    }
     @Override
     public boolean equals(Object o) {
         Point point = (Point) o;

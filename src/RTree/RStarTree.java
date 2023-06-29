@@ -2,6 +2,7 @@ package RTree;
 
 import utilities.Point;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class RStarTree {
@@ -195,24 +196,79 @@ public class RStarTree {
 
     }
     public void bulkBuild (ArrayList<Entry<Entry.RecordPointer>> entries) {
-        HashMap<Entry<Entry.RecordPointer>, Point> rankMap = new HashMap<>();
+
+        class EntryWrapper {
+            Entry<Entry.RecordPointer> entry;
+            Point rankSpacePoint;
+        }
+
+        ArrayList<EntryWrapper> rankedEntries = new ArrayList<>();
         int DIMENSION = entries.get(0).mbr.DIMENSION;
-        for (Entry<Entry.RecordPointer> entry: entries)
-            rankMap.put(entry, new Point(DIMENSION));
+        for (Entry<Entry.RecordPointer> entry: entries) {
+            EntryWrapper er = new EntryWrapper();
+            er.entry = entry;
+            er.rankSpacePoint = new Point(DIMENSION);
+            rankedEntries.add(er);
+        }
 
         for (int axis = 0; axis < DIMENSION; axis++) {
-            entries.sort(Entry.rankSpaceSort(axis));
-            for(int i = 0; i < entries.size(); i++){
-                Entry<Entry.RecordPointer> entry = entries.get(i);
-                Point p = rankMap.get(entries.get(i));
+            int finalAxis = axis;
+            rankedEntries.sort((o1, o2) -> {
+                int comparison = 0;
+                for (int i = finalAxis; i < o1.entry.getMbr().DIMENSION; i++) {
+                    comparison = Double.compare(o1.entry.getMbr().toPoint().getX()[i], o2.entry.getMbr().toPoint().getX()[i]);
+                    if (comparison == 0)
+                        continue;
+                    return comparison;
+                }
+                for (int i = 0; i < finalAxis; i++) {
+                    comparison = Double.compare(o1.entry.getMbr().toPoint().getX()[i], o2.entry.getMbr().toPoint().getX()[i]);
+                    if (comparison == 0)
+                        continue;
+                    return comparison;
+                }
+                return comparison;
+            });
+            for(int i = 0; i < rankedEntries.size(); i++){
+                Point p = rankedEntries.get(i).rankSpacePoint;
                 p.getX()[axis] = i;
-                rankMap.put(entry, p);
             }
         }
 
+        rankedEntries.sort(Comparator.comparingInt(o -> o.rankSpacePoint.zOrder()));
 
+        LinkedList<Node> Q = new LinkedList<>();
 
+        int cap = 0;
+        Node node = new Node(0);
+        for (int i = 0; i < rankedEntries.size(); i++) {
+            if(cap == MAX_CAPACITY){
+                cap = 0;
+                Q.add(node);
+                node = new Node(0);
+            }
+            node.addEntry(rankedEntries.get(i).entry);
+            cap++;
+        }
+
+        cap = 0;
+        Node nextLevelNode = new Node(1);
+        while(Q.size() > 1){
+
+            if(cap == MAX_CAPACITY){
+                cap = 0;
+                Q.add(nextLevelNode);
+                nextLevelNode = new Node(nextLevelNode.LEVEL + 1);
+            }
+            Node nodeToAdd = Q.removeFirst();
+            Entry<Node> entryToAdd = new Entry<>(MBR.fitMBR(nodeToAdd.entries), nodeToAdd);
+            nextLevelNode.addEntry(entryToAdd);
+            cap++;
+        }
+
+        this.root = Q.removeFirst();
     }
+
     public Node getRoot() {
         return root;
     }

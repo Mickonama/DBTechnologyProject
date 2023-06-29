@@ -74,7 +74,6 @@ public class OSMParser {
 
             }
             long endTime = System.currentTimeMillis();
-            System.out.println("It took " + (endTime - startTime) + " milliseconds");
 
             myReader.close();
             writer.close();

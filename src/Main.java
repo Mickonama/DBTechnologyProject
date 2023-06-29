@@ -16,7 +16,7 @@ public class Main {
 //        osm.osmToCsv();
         DiskManager dm = new DiskManager();
         dm.makeDatafile();
-        System.out.println(dm.RECORDS_PER_BLOCK);
+//        System.out.println(dm.RECORDS_PER_BLOCK);
         RStarTree rst = new RStarTree(8);
         for (int i = 1; i < dm.NUMBER_OF_BLOCKS; i++) {
             ArrayList<Record> block = dm.readBlock(i);
@@ -90,5 +90,28 @@ public class Main {
             }
         }
         System.out.println(z);
+
+        rst = new RStarTree(8);
+        ArrayList<Entry<Entry.RecordPointer>> recordsToAdd = new ArrayList<>();
+
+        for (int i = 1; i < dm.NUMBER_OF_BLOCKS; i++) {
+            ArrayList<Record> block = dm.readBlock(i);
+            for (int slot = 0; slot < block.size(); slot++) {
+                recordsToAdd.add(new Entry<>(new MBR(block.get(slot).getP()), new Entry.RecordPointer(i, slot)));
+            }
+            System.out.println("block " + i + " done");
+//            System.out.println(rst.DEPTH);
+        }
+        rst.bulkBuild(recordsToAdd);
+
+        query = new IndexedQuery(rst);
+        result = query.rangeQuery(queryMBR);
+        rTreeQueryResult = new ArrayList<>();
+        for (Entry<Entry.RecordPointer> entry: result){
+            rTreeQueryResult.add(dm.retrieveRecord(entry));
+        }
+        rTreeQueryResult.forEach(System.out::println);
+
+        System.out.println();
     }
 }
