@@ -10,7 +10,7 @@ public class OSMParser {
         this.PATH_TO_OSM = PATH_TO_OSM;
     }
 
-    public void osmToCsv(){
+    public void osmToCsv(String filename){
         StringBuilder nodeId = new StringBuilder();
         StringBuilder lat = new StringBuilder();
         StringBuilder lon = new StringBuilder();
@@ -18,7 +18,7 @@ public class OSMParser {
         try {
             File map = new File(PATH_TO_OSM); // .osm file name
             Scanner myReader = new Scanner(map);
-            BufferedWriter writer = new BufferedWriter(new FileWriter("coordinates.csv")); // the new .txt file
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename)); // the new .txt file
 
             char temp;
             int i;
@@ -60,7 +60,7 @@ public class OSMParser {
 
                     tempLon = Double.parseDouble(lon.toString());
 
-                    writer.write(tempNodeId + "," + tempLat + "," + tempLon + "\n");
+                    writer.write(tempNodeId + "," + tempLon + "," + tempLat + "\n");
 
 
 
@@ -74,6 +74,7 @@ public class OSMParser {
 
             }
             long endTime = System.currentTimeMillis();
+//            System.out.println("It took " + (endTime - startTime) + " milliseconds");
 
             myReader.close();
             writer.close();
