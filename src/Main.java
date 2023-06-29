@@ -81,5 +81,14 @@ public class Main {
             rTreeQueryResult.add(dm.retrieveRecord(entry));
         }
         rTreeQueryResult.forEach(System.out::println);
+
+        int x = 19, y = 47, z = 0;
+        Point p = new Point(3, new double[] {2, 3});
+        for (int i = 0; i < Integer.SIZE; i++) {
+            for (int axis = 0; axis < 2; axis++) {
+                z |= ((((int) p.getX()[axis]) & (1 << i)) << (i + axis));
+            }
+        }
+        System.out.println(z);
     }
 }
