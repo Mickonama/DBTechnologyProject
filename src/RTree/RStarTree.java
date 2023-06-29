@@ -194,7 +194,25 @@ public class RStarTree {
         return null;
 
     }
+    public void bulkBuild (ArrayList<Entry<Entry.RecordPointer>> entries) {
+        HashMap<Entry<Entry.RecordPointer>, Point> rankMap = new HashMap<>();
+        int DIMENSION = entries.get(0).mbr.DIMENSION;
+        for (Entry<Entry.RecordPointer> entry: entries)
+            rankMap.put(entry, new Point(DIMENSION));
 
+        for (int axis = 0; axis < DIMENSION; axis++) {
+            entries.sort(Entry.rankSpaceSort(axis));
+            for(int i = 0; i < entries.size(); i++){
+                Entry<Entry.RecordPointer> entry = entries.get(i);
+                Point p = rankMap.get(entries.get(i));
+                p.getX()[axis] = i;
+                rankMap.put(entry, p);
+            }
+        }
+
+
+
+    }
     public Node getRoot() {
         return root;
     }
