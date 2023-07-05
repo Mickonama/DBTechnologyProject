@@ -18,6 +18,7 @@ public class Examples {
     public ArrayList<Example> queryExamples = new ArrayList<Example>();
 
     public Examples() {
+
     }
 
     public void test_mbr() throws IOException {
@@ -34,9 +35,8 @@ public class Examples {
                 }
             }
 
-            System.out.println("Queries Time for Map: " + queryExamples.get(ex_i).map_name);
+            System.out.println("MBR Time for Map: " + queryExamples.get(ex_i).map_name);
             System.out.println("MBR: " + queryExamples.get(ex_i).mbr);
-            System.out.println("Point: " + queryExamples.get(ex_i).point);
 
             IndexedQuery inq = new IndexedQuery(rst);
             inq.rangeQuery(queryExamples.get(ex_i).mbr);
@@ -49,32 +49,88 @@ public class Examples {
     }
 
     public void test_knn() throws IOException {
-        System.out.println("Queries Time for Map: " + queryExamples.get(0).map_name);
-        System.out.println("MBR: " + queryExamples.get(0).mbr);
-        System.out.println("Point: " + queryExamples.get(0).point);
-        for (double f = 0.05; f <= 1.01; f += 0.05) {
-            OSMParser osm = new OSMParser("Maps/map0.osm");
+        for (int ex_i = 0; ex_i < queryExamples.size(); ex_i++) {
+            OSMParser osm = new OSMParser("Maps/" + queryExamples.get(ex_i).map_name);
             osm.osmToCsv("coordinates.csv");
-            DiskManager dm = new DiskManager("datafile" + f);
+            DiskManager dm = new DiskManager("datafile" + ex_i);
             dm.makeDatafile("coordinates.csv");
             RStarTree rst = new RStarTree(8);
-            for (int i = 1; i < Math.floor(dm.NUMBER_OF_BLOCKS * f); i++) {
+            for (int i = 1; i < dm.NUMBER_OF_BLOCKS; i++) {
                 ArrayList<Record> block = dm.readBlock(i);
                 for (int slot = 0; slot < block.size(); slot++) {
                     rst.insertData(new MBR(block.get(slot).getP()), i, slot);
                 }
-//                System.out.println("block " + i + " done");
             }
-            System.out.println("Percent: " + f);
+
+            System.out.println("KNN Time for Map: " + queryExamples.get(ex_i).map_name);
+            System.out.println("Point: " + queryExamples.get(ex_i).point);
 
             IndexedQuery inq = new IndexedQuery(rst);
-            inq.kNNQuery(queryExamples.get(0).point, 100);
+            inq.kNNQuery(queryExamples.get(ex_i).point, 100);
 
             SerialQuery srq = new SerialQuery(dm);
-            srq.serialKNN(queryExamples.get(0).point, 100);
+            srq.serialKNN(queryExamples.get(ex_i).point, 100);
 
-            System.out.println("\n");
+            System.out.println("\n\n");
         }
     }
 
+    public void test_bulk() throws IOException {
+        for (int ex_i = 0; ex_i < queryExamples.size(); ex_i++) {
+            System.out.println("Sequential vs Bulk Insert Time for: " + queryExamples.get(ex_i).map_name);
+
+            OSMParser osm = new OSMParser("Maps/" + queryExamples.get(ex_i).map_name);
+            osm.osmToCsv("coordinates.csv");
+            DiskManager dm = new DiskManager("datafile" + ex_i);
+            dm.makeDatafile("coordinates.csv");
+
+            RStarTree sequential = new RStarTree(8);
+            long start = System.nanoTime();
+            for (int i = 1; i < dm.NUMBER_OF_BLOCKS; i++) {
+                ArrayList<Record> block = dm.readBlock(i);
+                for (int slot = 0; slot < block.size(); slot++) {
+                    sequential.insertData(new MBR(block.get(slot).getP()), i, slot);
+                }
+            }
+            System.out.println("Sequential insert completed: " + (System.nanoTime() - start) + " ns");
+            RStarTree bulk = new RStarTree(8);
+            start = System.nanoTime();
+            ArrayList<Entry<Entry.RecordPointer>> recordsToAdd = new ArrayList<>();
+
+            for (int i = 1; i < dm.NUMBER_OF_BLOCKS; i++) {
+                ArrayList<Record> block = dm.readBlock(i);
+                for (int slot = 0; slot < block.size(); slot++) {
+                    recordsToAdd.add(new Entry<>(new MBR(block.get(slot).getP()), new Entry.RecordPointer(i, slot)));
+                }
+            }
+            bulk.bulkBuild(recordsToAdd);
+            System.out.println("Bulk insert completed: " + (System.nanoTime() - start) + " ns");
+
+
+            System.out.println("\n\n");
+        }
+    }
+
+    public void test_skyline() throws IOException {
+        for (int ex_i = 0; ex_i < queryExamples.size(); ex_i++) {
+            OSMParser osm = new OSMParser("Maps/" + queryExamples.get(ex_i).map_name);
+            osm.osmToCsv("coordinates.csv");
+            DiskManager dm = new DiskManager("datafile" + ex_i);
+            dm.makeDatafile("coordinates.csv");
+            RStarTree rst = new RStarTree(8);
+            for (int i = 1; i < dm.NUMBER_OF_BLOCKS; i++) {
+                ArrayList<Record> block = dm.readBlock(i);
+                for (int slot = 0; slot < block.size(); slot++) {
+                    rst.insertData(new MBR(block.get(slot).getP()), i, slot);
+                }
+            }
+
+            System.out.println("Skyline Time for Map: " + queryExamples.get(ex_i).map_name);
+
+            IndexedQuery inq = new IndexedQuery(rst);
+            inq.skyline();
+
+            System.out.println("\n\n");
+        }
+    }
 }
