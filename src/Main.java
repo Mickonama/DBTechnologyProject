@@ -49,7 +49,7 @@ public class Main {
         IndexedQuery iq = new IndexedQuery(tree);
         SerialQuery sq = new SerialQuery(dm);
 
-        System.out.print("Enter 'mbr' to run range query or 'knn' for k-nearest neighbors: ");
+        System.out.print("Enter 'mbr' to run range query or 'knn' for k-nearest neighbors o 'sky' for skyline: ");
         String option = scanner.next();
 
         if (option.equalsIgnoreCase("mbr")) {
@@ -60,10 +60,11 @@ public class Main {
                 mbrBounds[i][1] = scanner.nextDouble();
             }
             MBR mbr = new MBR(mbrBounds);
-            iq.rangeQuery(mbr);
+            iq.rangeQuery(mbr).forEach(System.out::println);
 
-            SerialQuery srq = new SerialQuery(dm);
-            sq.rangeQuery(mbr);
+            System.out.println("\n");
+
+            sq.rangeQuery(mbr).forEach(System.out::println);
         } else if (option.equalsIgnoreCase("knn")) {
             double[] knnPoint = new double[dimensions];
             for (int i = 0; i < dimensions; i++) {
@@ -71,9 +72,13 @@ public class Main {
                 knnPoint[i] = scanner.nextDouble();
             }
             Point p = new Point(dimensions, knnPoint);
-            iq.kNNQuery(p, 100);
+            iq.kNNQuery(p, 100).forEach(System.out::println);
 
-            sq.serialKNN(p, 100);
+            System.out.println("\n");
+
+            sq.serialKNN(p, 100).forEach(System.out::println);
+        } else if (option.equalsIgnoreCase("sky")) {
+            iq.skyline().forEach(System.out::println);
         } else {
             System.out.println("Invalid option!");
         }
