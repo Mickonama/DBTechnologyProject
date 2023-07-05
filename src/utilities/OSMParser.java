@@ -3,6 +3,9 @@ package utilities;
 import java.io.*;
 import java.util.Scanner;
 
+/**
+ * Class for reading an OSM file and converting in into a .csv
+ */
 public class OSMParser {
     private final String PATH_TO_OSM;
 

@@ -19,7 +19,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
 
-        System.out.print("Enter the input file name: ");
+        System.out.print("Enter the input (.osm / .csv) file name: ");
         String fileName = scanner.nextLine();
 
         if (fileName.endsWith(".osm")) {
@@ -49,7 +49,7 @@ public class Main {
         IndexedQuery iq = new IndexedQuery(tree);
         SerialQuery sq = new SerialQuery(dm);
 
-        System.out.print("Enter 'mbr' to run minimum bounding rectangle or 'knn' for k-nearest neighbors: ");
+        System.out.print("Enter 'mbr' to run range query or 'knn' for k-nearest neighbors: ");
         String option = scanner.next();
 
         if (option.equalsIgnoreCase("mbr")) {

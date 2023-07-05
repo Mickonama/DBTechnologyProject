@@ -1,7 +1,5 @@
 package RTree;
-
-import utilities.Point;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -9,7 +7,7 @@ import java.util.Comparator;
  * This class implements an entry of an R*tree node
  * @param <T> is the pointer of an entry (can be either a Node or a RecordPointer)
  */
-public class Entry<T> {
+public class Entry<T> implements Serializable {
     MBR mbr; //The entry's MBR
     T pointer; //The entry's pointer (can be either a Node or a RecordPointer)
 

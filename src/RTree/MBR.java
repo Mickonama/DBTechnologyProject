@@ -2,14 +2,14 @@ package RTree;
 
 import utilities.Point;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * This class represents a Minimum Bounding Rectangle in the n-dimensional space
  */
-public class MBR {
+public class MBR implements Serializable {
     final int DIMENSION; //The dimension of the rectangle
 
     double[][] bounds; //The bounds of the rectangle

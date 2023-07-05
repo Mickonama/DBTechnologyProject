@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * This class represents a point in the n-dimensional space
+ */
 public class Point implements Serializable {
     public final int DIMENSION;
 
