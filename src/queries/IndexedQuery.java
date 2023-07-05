@@ -11,7 +11,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 /**
- *  Class implements different query algorithms
+ *  Class implements different R*tree indexed query algorithms
  */
 public class IndexedQuery {
 
@@ -39,6 +39,13 @@ public class IndexedQuery {
         MBR mbr = new MBR(p);
         return rangeQuery(mbr);
     }
+
+    /**
+     * This method implements an R*tree indexed range query within an n-dimensional bounded rectangle
+     * @param mbr is the minimum bounding rectangle of the range query
+     * @param currentNode
+     * @return an arraylist of all the entries that lie within the MBR
+     */
     private ArrayList<Entry<Entry.RecordPointer>> rangeQuery(MBR mbr, Node currentNode) {
         ArrayList<Entry<Entry.RecordPointer>> foundEntries = new ArrayList<>();
         if (currentNode.isLeaf()) {
@@ -65,6 +72,13 @@ public class IndexedQuery {
 
         return new ArrayList<>(kNNQueue);
     }
+
+    /**
+     * This method implements an R*tree k-nearest neighbor query
+     * @param currentNode
+     * @param k the k-neighbors parameter
+     * @param p the point for which the nearest neighbors are calculates
+     */
     private void kNNQuery(Node currentNode, int k, Point p){
 
         currentNode.getEntries().sort(Comparator.comparingDouble((o -> o.getMbr().minDist(p))));
@@ -87,6 +101,10 @@ public class IndexedQuery {
 
     }
 
+    /**
+     * This method implements a skyline query
+     * @return an arraylist of all the non-dominated points
+     */
     public ArrayList<Entry<Entry.RecordPointer>> skyline(){
 
         long start = System.nanoTime();

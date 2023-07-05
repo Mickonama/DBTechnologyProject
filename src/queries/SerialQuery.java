@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+/**
+ * This class implements a serial range and k-NN query
+ */
 public class SerialQuery {
     DiskManager dm;
 
@@ -29,6 +32,11 @@ public class SerialQuery {
         return rangeQuery(mbr);
     }
 
+    /**
+     * This method implements a serial range query within an n-dimensional bounded rectangle
+     * @param mbr is the minimum bounding rectangle of the range query
+     * @return an arraylist of Records that lie within the MBR of the range query
+     */
     private ArrayList<Record> performRangeQuery(MBR mbr) {
         ArrayList<Record> queriedRecord = new ArrayList<>();
         for (int i = 1; i < dm.NUMBER_OF_BLOCKS; i++) {
@@ -43,6 +51,12 @@ public class SerialQuery {
         return queriedRecord;
     }
 
+    /**
+     * This method implements a serial k-nearest neighbor query
+     * @param p the point for which the nearest neighbors are calculates
+     * @param k the k-neighbors parameter
+     * @return an arraylist of the k nearest neighbors of point p
+     */
     public ArrayList<Record> serialKNN(Point p, int k) {
         long start = System.nanoTime();
         PriorityQueue<Record> kNNs = new PriorityQueue<>(Comparator.comparingDouble(o -> -new MBR(o.getP()).minDist(p)));

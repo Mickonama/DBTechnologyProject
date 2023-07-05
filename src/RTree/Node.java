@@ -3,25 +3,20 @@ package RTree;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+/**
+ * This class represents a Node of the R*tree
+ */
 public class Node implements Serializable {
 
-    int LEVEL;
-//    Entry<Node> parentEntry;
-//    Node parentNode;
+    int LEVEL; //The depth level on which this node is located
 
-    ArrayList<Entry<?>> entries;
+    ArrayList<Entry<?>> entries; //The entries that are contained within the node
 
     public Node(int LEVEL) {
         this.LEVEL = LEVEL;
-//        parentNode = null;
         entries = new ArrayList<>();
     }
 
-
-//    public Node(int LEVEL, Node parentNode) {
-//        this(LEVEL);
-//        this.parentNode = parentNode;
-//    }
 
     public Node(int LEVEL, ArrayList<Entry<?>> entries) {
         this(LEVEL);
@@ -33,14 +28,18 @@ public class Node implements Serializable {
         return entries;
     }
 
-    public boolean childIsLeaf() {
-        return LEVEL - 1 == 0;
-    }
-
+    /**
+     * Checks if the current node is at the leaf level
+     * @return True if the node is a leaf, False otherwise
+     */
     public boolean isLeaf() {
         return LEVEL == 0;
     }
 
+    /**
+     * Adds an entry to the nodes entry arraylist
+     * @param entry the entry to be added
+     */
     public void addEntry(Entry<?> entry) {
         entries.add(entry);
     }
